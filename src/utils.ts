@@ -29,7 +29,7 @@ export const calculateDiff = (current: ListingKvItem[], previous: ListingKvItem[
   const changed = current
     .map((item) => {
       const previousItem = previous.find(
-        (p) => p.type === item.type && p.number === item.number
+        ({ type, number }) => type === item.type && number === item.number
       );
 
       if (!previousItem) {
@@ -42,7 +42,7 @@ export const calculateDiff = (current: ListingKvItem[], previous: ListingKvItem[
 
       return;
     })
-    .filter((x): x is { item: ListingKvItem; previousStatus: string } => x !== null);
+    .filter((item) => item !== null);
 
   return { changed };
 };
@@ -105,10 +105,8 @@ export async function performScraping(): Promise<ScrapingResult> {
   }
 }
 
-
-
 async function fetchHtml(url: string): Promise<string> {
-  const cachePath = path.join(process.cwd(), 'dist', 'cache.html');
+  const cachePath = path.join(process.cwd(), 'api', 'cache.html');
 
   if (env.NODE_ENV !== 'production' && fs.existsSync(cachePath)) {
     return fs.readFileSync(cachePath, 'utf-8');

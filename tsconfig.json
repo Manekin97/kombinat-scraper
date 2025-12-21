@@ -8,7 +8,7 @@
     "skipLibCheck": true,
     "strict": true,
     "resolveJsonModule": true,
-    "outDir": "./dist",
+    "outDir": "./api",
     "rootDir": "./",
     "declaration": true,
     "declarationMap": true,
