@@ -42,7 +42,7 @@ export const calculateDiff = (current: ListingKvItem[], previous: ListingKvItem[
 
       return;
     })
-    .filter((item): item is { item: ListingKvItem; previousStatus: string } => item !== null);
+    .filter((item): item is { item: ListingKvItem; previousStatus: string } => !!item);
 
   return { changed };
 };
@@ -73,7 +73,7 @@ export async function sendSmsNotification(diff: {
     });
   } catch (error) {
     return {
-      errorMessage: error instanceof Error ? error.message : 'Unknown error',
+      errorMessage: `[sendSmsNotification]: ${error instanceof Error ? error.message : 'Unknown error'}`,
     };
   }
 }
@@ -101,7 +101,7 @@ export async function performScraping(): Promise<ScrapingResult> {
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 
-    throw new Error(`Failed to scrape ${LISTING_URL}: ${errorMessage}`);
+    throw new Error(`[performScraping]: Failed to scrape ${LISTING_URL}: ${errorMessage}`);
   }
 }
 
