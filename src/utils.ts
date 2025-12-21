@@ -42,7 +42,7 @@ export const calculateDiff = (current: ListingKvItem[], previous: ListingKvItem[
 
       return;
     })
-    .filter((item) => item !== null);
+    .filter((item): item is { item: ListingKvItem; previousStatus: string } => item !== null);
 
   return { changed };
 };
