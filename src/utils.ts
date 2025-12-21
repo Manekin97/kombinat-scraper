@@ -21,7 +21,7 @@ export const saveCurrentState = async (key: string, listings: ListingKvItem[]): 
 
 export const randomDelay = async (minMs: number = 1000, maxMs: number = 30000) => {
   const delay = Math.floor(Math.random() * (maxMs - minMs + 1) + minMs);
-  console.log(`Waiting for ${delay}ms...`);
+
   return new Promise((resolve) => setTimeout(resolve, delay));
 };
 
