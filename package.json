@@ -1,0 +1,32 @@
+{
+  "name": "kombinat-scraper",
+  "version": "1.0.0",
+  "description": "A scraper cron job deployed on Vercel",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "run:dev": "vercel dev",
+    "validate-envs": "tsx src/env.ts",
+    "build": "pnpm validate-envs && node scripts/build.js",
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "@vercel/kv": "^1.0.1",
+    "axios": "^1.6.0",
+    "cheerio": "^1.0.0-rc.12",
+    "dotenv": "^17.2.3",
+    "lodash": "^4.17.21",
+    "twilio": "^5.11.1",
+    "zod": "^4.2.1"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.17.21",
+    "@types/node": "^20.0.0",
+    "@vercel/ncc": "^0.38.4",
+    "@vercel/node": "^3.0.0",
+    "prettier": "^3.7.4",
+    "tsx": "^4.21.0",
+    "typescript": "^5.0.0",
+    "vercel": "^33.0.0"
+  }
+}

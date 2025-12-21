@@ -1,0 +1,21 @@
+{
+  "buildCommand": "pnpm run build",
+  "outputDirectory": "public",
+  "functions": {
+    "dist/index.js": {
+      "maxDuration": 60
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api",
+      "destination": "/dist/index.js"
+    }
+  ],
+  "crons": [
+    {
+      "path": "/api",
+      "schedule": "0 14 * * *"
+    }
+  ]
+}
