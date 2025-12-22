@@ -58,7 +58,7 @@ export async function sendSmsNotification(diff: {
     const changedDetails = diff.changed
       .map(
         ({ item, previousStatus }) =>
-          `${item.type === 'parking' ? 'p.' : 'm.'} ${item.number} - (${previousStatus}->${item.status})`
+          `${item.type === 'parking' ? 'p.' : 'm.'} ${item.number} - (${previousStatus} -> ${item.status})`
       )
       .join('\n');
 
@@ -67,7 +67,7 @@ export async function sendSmsNotification(diff: {
 
   try {
     await client.messages.create({
-      body: messageParts.join(' | '),
+      body: messageParts.join('\n'),
       from: env.TWILIO_PHONE_NUMBER,
       to: env.TARGET_PHONE_NUMBER,
     });
