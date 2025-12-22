@@ -52,15 +52,15 @@ export async function sendSmsNotification(diff: {
 }) {
   const client = twilio(env.TWILIO_ACCOUNT_SID, env.TWILIO_AUTH_TOKEN);
 
-  const messageParts = ['Kombinat Update:'];
+  const messageParts = ['Kombinat Update:\n'];
 
   if (diff.changed.length > 0) {
     const changedDetails = diff.changed
       .map(
         ({ item, previousStatus }) =>
-          `${item.type === 'parking' ? 'p' : 'm'}${item.number}(${previousStatus}->${item.status})`
+          `${item.type === 'parking' ? 'p.' : 'm.'} ${item.number} - (${previousStatus}->${item.status})`
       )
-      .join(',');
+      .join('\n');
 
     messageParts.push(`Zmieniono status: ${changedDetails}`);
   }
@@ -156,7 +156,15 @@ function parseListings($: cheerio.CheerioAPI): ListingKvItem[] {
     const typeIndicator = match[1].toLowerCase();
     const number = match[2];
     const type: 'apartment' | 'parking' = typeIndicator.includes('p') ? 'parking' : 'apartment';
-    const status = $row.find('td[class*="status-color"]').text().trim() || 'Unknown';
+
+    let status = 'Unknown';
+    if (text.includes('Dostępne')) {
+      status = 'Dostępne';
+    } else if (text.includes('Zarezerwowane')) {
+      status = 'Zarezerwowane';
+    } else if (text.includes('Sprzedane')) {
+      status = 'Sprzedane';
+    }
 
     listings.push({
       number,
