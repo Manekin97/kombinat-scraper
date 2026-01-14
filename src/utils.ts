@@ -47,12 +47,18 @@ export const calculateDiff = (current: ListingKvItem[], previous: ListingKvItem[
   return { changed };
 };
 
-export async function sendSmsNotification(diff: {
-  changed: { item: ListingKvItem; previousStatus: string }[];
-}) {
+export async function sendSmsNotification(
+  diff: {
+    changed: { item: ListingKvItem; previousStatus: string }[];
+  },
+  availableApartmentsCount: number,
+  availableParkingSpotsCount: number
+) {
   const client = twilio(env.TWILIO_ACCOUNT_SID, env.TWILIO_AUTH_TOKEN);
 
-  const messageParts = ['Kombinat Update:\n'];
+  const messageParts = [
+    `Kombinat Update (m: ${availableApartmentsCount}, p: ${availableParkingSpotsCount}):\n`,
+  ];
 
   if (diff.changed.length > 0) {
     const changedDetails = diff.changed
@@ -78,6 +84,22 @@ export async function sendSmsNotification(diff: {
   }
 }
 
+export async function sendEqualityNotification() {
+  const client = twilio(env.TWILIO_ACCOUNT_SID, env.TWILIO_AUTH_TOKEN);
+
+  try {
+    await client.messages.create({
+      body: `Kombinat Update:\nLiczba dostępnych mieszkań i miejsc parkingowych jest równa`,
+      from: env.TWILIO_PHONE_NUMBER,
+      to: env.TARGET_PHONE_NUMBER,
+    });
+  } catch (error) {
+    return {
+      errorMessage: `[sendEqualityNotification]: ${error instanceof Error ? error.message : 'Unknown error'}`,
+    };
+  }
+}
+
 export async function performScraping(): Promise<ScrapingResult> {
   try {
     const html = await fetchHtml(LISTING_URL);
@@ -88,11 +110,19 @@ export async function performScraping(): Promise<ScrapingResult> {
 
     const apartmentsCount = uniqueListings.filter((item) => item.type === 'apartment').length;
     const parkingSpotsCount = uniqueListings.filter((item) => item.type === 'parking').length;
+    const availableApartmentsCount = uniqueListings.filter(
+      (item) => item.type === 'apartment' && item.status === 'Dostępne'
+    ).length;
+    const availableParkingSpotsCount = uniqueListings.filter(
+      (item) => item.type === 'parking' && item.status === 'Dostępne'
+    ).length;
 
     return {
       itemsProcessed: uniqueListings.length,
       apartmentsCount,
       parkingSpotsCount,
+      availableApartmentsCount,
+      availableParkingSpotsCount,
       status: 'completed',
       listings: uniqueListings,
       scrapedAt: new Date().toISOString(),

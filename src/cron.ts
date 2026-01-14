@@ -4,6 +4,7 @@ import {
   getPreviousState,
   calculateDiff,
   sendSmsNotification,
+  sendEqualityNotification,
   saveCurrentState,
   randomDelay,
 } from './utils.js';
@@ -28,7 +29,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const diff = calculateDiff(result.listings, previousState?.listings || []);
 
     if (diff.changed.length > 0) {
-      await sendSmsNotification(diff);
+      await sendSmsNotification(
+        diff,
+        result
+      );
+    }
+
+    const countsAreEqual = result.availableApartmentsCount === result.availableParkingSpotsCount;
+
+    if (countsAreEqual) {
+      await sendEqualityNotification();
     }
 
     await saveCurrentState(LISTINGS_KV_KEY, result.listings);

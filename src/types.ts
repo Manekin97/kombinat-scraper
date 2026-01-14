@@ -11,6 +11,8 @@ export interface ScrapingResult {
   itemsProcessed: number;
   apartmentsCount: number;
   parkingSpotsCount: number;
+  availableApartmentsCount: number;
+  availableParkingSpotsCount: number;
   status: string;
   listings: ListingKvItem[];
   scrapedAt: string;
