@@ -51,13 +51,12 @@ export async function sendSmsNotification(
   diff: {
     changed: { item: ListingKvItem; previousStatus: string }[];
   },
-  availableApartmentsCount: number,
-  availableParkingSpotsCount: number
+  result: ScrapingResult
 ) {
   const client = twilio(env.TWILIO_ACCOUNT_SID, env.TWILIO_AUTH_TOKEN);
 
   const messageParts = [
-    `Kombinat Update (m: ${availableApartmentsCount}, p: ${availableParkingSpotsCount}):\n`,
+    `Kombinat Update (m: ${result.availableApartmentsCount}, p: ${result.availableParkingSpotsCount}):\n`,
   ];
 
   if (diff.changed.length > 0) {
