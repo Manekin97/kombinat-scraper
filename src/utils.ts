@@ -175,6 +175,12 @@ function parseListings($: cheerio.CheerioAPI): ListingKvItem[] {
 
   $('tr').each((_, element) => {
     const $row = $(element);
+    
+    // Skip detail rows
+    if ($row.hasClass('details') || $row.hasClass('more-info-house')) {
+      return;
+    }
+    
     const text = $row.text().trim();
     const match = text.match(pattern);
 
