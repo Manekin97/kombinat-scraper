@@ -55,27 +55,45 @@ export async function sendSmsNotification(
 ) {
   const client = twilio(env.TWILIO_ACCOUNT_SID, env.TWILIO_AUTH_TOKEN);
 
-  const messageParts = [
-    `Kombinat Update (m: ${result.availableApartmentsCount}, p: ${result.availableParkingSpotsCount}):\n`,
-  ];
-
-  if (diff.changed.length > 0) {
-    const changedDetails = diff.changed
-      .map(
-        ({ item, previousStatus }) =>
-          `${item.type === 'parking' ? 'p.' : 'm.'} ${item.number} - (${previousStatus} -> ${item.status})`
-      )
-      .join('\n');
-
-    messageParts.push(`Zmieniono status: ${changedDetails}`);
+  // Build message content
+  const header = `Kombinat Update (m: ${result.availableApartmentsCount}, p: ${result.availableParkingSpotsCount})`;
+  
+  if (diff.changed.length === 0) {
+    return;
   }
 
+  const changedLines = diff.changed.map(
+    ({ item, previousStatus }) =>
+      `${item.type === 'parking' ? 'p.' : 'm.'} ${item.number} - (${previousStatus} -> ${item.status})`
+  );
+
+  // Split into messages of ~140 chars each to stay under 160 limit 
+  const messages: string[] = [];
+  let currentMessage = header;
+
+  for (const line of changedLines) {
+    const testMessage = currentMessage + '\n' + line;
+    if (testMessage.length > 140) {
+      messages.push(currentMessage);
+      currentMessage = line;
+    } else {
+      currentMessage = testMessage;
+    }
+  }
+
+  messages.push(currentMessage);
+
   try {
-    await client.messages.create({
-      body: messageParts.join('\n'),
-      from: env.TWILIO_PHONE_NUMBER,
-      to: env.TARGET_PHONE_NUMBER,
-    });
+    const totalMessages = messages.length;
+
+    for (let i = 0; i < totalMessages; i++) {
+      
+      await client.messages.create({
+        body: `${messages[i]} [${i + 1}/${totalMessages}]`,
+        from: env.TWILIO_PHONE_NUMBER,
+        to: env.TARGET_PHONE_NUMBER,
+      });
+    }
   } catch (error) {
     return {
       errorMessage: `[sendSmsNotification]: ${error instanceof Error ? error.message : 'Unknown error'}`,
